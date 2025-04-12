@@ -11,8 +11,8 @@ COPY package*.json ./
 # 安裝依賴但禁用 postinstall 腳本
 RUN npm install --ignore-scripts
 
-# 安裝 TypeScript
-RUN npm install -D typescript
+# 安裝 TypeScript 並全局安裝
+RUN npm install -g typescript
 
 # 複製 tsconfig.json 和其他配置文件
 COPY tsconfig.json ./
@@ -20,8 +20,8 @@ COPY tsconfig.json ./
 # 複製源代碼
 COPY . .
 
-# 使用正確的 TypeScript 編譯器
-RUN npx typescript tsc
+# 直接使用全局安裝的 tsc
+RUN tsc
 
 # 暴露端口
 EXPOSE 3000

@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=concert_ticket_booking
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    volumes:
+      # 掛載源代碼（開發環境使用）
+      - ./:/app
+      # 排除 node_modules，使用容器內的版本
+      - /app/node_modules
+      # 排除 dist 目錄，避免覆蓋容器內編譯的檔案
+      - /app/dist
+    command: sh -c "npm install --ignore-scripts && ./node_modules/.bin/tsc --watch & nodemon --watch dist dist/bin/server.js"
+    depends_on:
+      - postgres
+  
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=concert_ticket_booking
+
+volumes:
+  postgres_data: 

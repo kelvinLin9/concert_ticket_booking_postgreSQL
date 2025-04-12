@@ -9,7 +9,7 @@ ENV NODE_ENV=production
 COPY package*.json ./
 
 # 安裝依賴 - 不執行 postinstall script 避免前置編譯錯誤
-RUN npm install --ignore-scripts
+RUN npm install
 
 # 複製 tsconfig.json 和其他配置文件
 COPY tsconfig.json ./
@@ -17,8 +17,8 @@ COPY tsconfig.json ./
 # 複製源代碼
 COPY . .
 
-# 使用絕對路徑的 TypeScript 編譯器進行構建
-RUN npx tsc
+# 使用 npm 腳本進行構建
+RUN npm run build
 
 # 暴露端口
 EXPOSE 3000

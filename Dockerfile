@@ -20,8 +20,8 @@ COPY tsconfig.json ./
 # 複製源代碼
 COPY . .
 
-# 使用 npx 運行 tsc 編譯
-RUN npx tsc
+# 使用正確的 TypeScript 編譯器
+RUN npx typescript tsc
 
 # 暴露端口
 EXPOSE 3000

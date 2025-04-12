@@ -257,8 +257,7 @@ export class User extends Model {
     // @ts-ignore
     if (instance.changed('password') && instance.password) {
       const salt = await bcrypt.genSalt(10);
-      // @ts-ignore
-      instance.password = await bcrypt.hash(instance.password, salt);
+      instance.password = await bcrypt.hash(String(instance.password), salt);
     }
   }
 

@@ -18,7 +18,7 @@ COPY tsconfig.json ./
 COPY . .
 
 # 使用絕對路徑的 TypeScript 編譯器進行構建
-RUN ./node_modules/.bin/tsc
+RUN npx tsc
 
 # 暴露端口
 EXPOSE 3000

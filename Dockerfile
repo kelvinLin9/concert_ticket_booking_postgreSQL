@@ -17,8 +17,8 @@ COPY tsconfig.json ./
 # 複製源代碼
 COPY . .
 
-# 現在運行構建腳本（tsc 應該已從 devDependencies 安裝）
-RUN npm run build
+# 直接使用 node_modules 中的 TypeScript 編譯器
+RUN ./node_modules/.bin/tsc
 
 # 暴露端口
 EXPOSE 3000

@@ -238,7 +238,7 @@ export class User extends Model {
     const token = crypto.randomBytes(32).toString('hex');
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 生成6位數驗證碼
 
-    this.passwordResetToken = token;
+    this.passwordResetToken = code; // 保存 code 而不是 token
     this.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10分鐘後過期
     this.lastPasswordResetAttempt = new Date(); // 記錄本次嘗試時間
     await this.save({ fields: ['passwordResetToken', 'passwordResetExpires', 'lastPasswordResetAttempt'] });

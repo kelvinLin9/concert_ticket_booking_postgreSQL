@@ -14,7 +14,7 @@ interface CustomRequest extends Request {
   };
 }
 
-const check = async (req: Request, res: Response, next: NextFunction) => {
+const checkAuthStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
@@ -29,26 +29,11 @@ const check = async (req: Request, res: Response, next: NextFunction) => {
       throw createHttpError(401, '請先登入');
     }
 
-    const user = await User.findByPk(customReq.user.userId, {
-      attributes: { 
-        exclude: ['password', 'verificationToken', 'verificationTokenExpires', 
-                 'passwordResetToken', 'passwordResetExpires', 'lastVerificationAttempt'] 
-      }
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        status: 'failed',
-        message: '找不到該使用者',
-      });
-    }
-
+    // 直接返回 userId 和 role，不再查詢完整的用戶資料
     res.status(200).json({
       status: 'success',
-      message: '',
-      data: {
-        user
-      }
+      userId: customReq.user.userId,
+      role: customReq.user.role
     });
   } catch (err) {
     next(err);
@@ -359,7 +344,7 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export {
-  check,
+  checkAuthStatus,
   getUser,
   getAllUsers,
   updateInfo,

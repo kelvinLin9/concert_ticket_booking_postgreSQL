@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  check,
+  checkAuthStatus,
 } from '../controller/user';
 import { handleErrorAsync } from '../statusHandle/handleErrorAsync';
 import { 
@@ -167,8 +167,9 @@ router.post('/request-password-reset', handleErrorAsync(requestPasswordReset));
 // 重置密碼
 router.post('/reset-password', handleErrorAsync(resetPassword));
 
-// 檢查是否登入
-router.get('/check', isAuth, check);
+// 檢查是否登入 (新路由名稱)
+router.get('/check-auth-status', isAuth, checkAuthStatus);
+
 
 // Google 登入
 router.get('/google', passport.authenticate('google', { 

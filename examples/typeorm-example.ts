@@ -5,6 +5,16 @@
  * 實際使用時需根據專案具體情況調整。
  */
 
+// 為Express Request擴展用戶屬性
+declare global {
+  namespace Express {
+    interface User {
+      id: string;
+      [key: string]: any;
+    }
+  }
+}
+
 // 實體定義示例
 import { 
   Entity, 
@@ -15,10 +25,13 @@ import {
   DeleteDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  OneToMany
+  OneToMany,
+  DataSource
 } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { Request, Response } from 'express';
+import { config } from 'dotenv';
 
 // OAuth提供者實體
 @Entity()
@@ -119,7 +132,7 @@ export class User {
   @Column({ nullable: true })
   lastPasswordResetAttempt?: Date;
 
-  @OneToMany(() => OAuthProvider, oauthProvider => oauthProvider.userId, {
+  @OneToMany(() => OAuthProvider, (oauthProvider: OAuthProvider) => oauthProvider.userId, {
     eager: true, // 自動載入關聯數據
     cascade: true // 自動保存關聯實體
   })
@@ -161,9 +174,6 @@ export class User {
  */
 
 // 數據源配置
-import { DataSource } from 'typeorm';
-import { config } from 'dotenv';
-
 config();
 
 // 創建數據源
@@ -201,11 +211,17 @@ export const connectDatabase = async () => {
 /**
  * 控制器示例 - 使用 Repository 模式
  */
-import { Request, Response } from 'express';
-
 export const updateUserProfile = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id; // 假設已經通過中間件設置
+    // Check if req.user exists before accessing its properties
+    if (!req.user) {
+      return res.status(401).json({
+        status: 'failed',
+        message: '未授權'
+      });
+    }
+    
+    const userId = req.user.id; // Now req.user is definitely not undefined
     const userRepository = AppDataSource.getRepository(User);
     
     // 獲取用戶

@@ -24,13 +24,13 @@ export const generateToken = (user: User) => {
   if (!process.env.JWT_SECRET || !process.env.JWT_EXPIRES_DAY) {
     throw new Error("Required JWT environment variables are not set.");
   }
-  console.log('generateToken user', user)
+  
   // 生成 payload，包括用戶 ID 和角色
   const payload = {
     userId: user.userId,
     role: user.role,
   };
-  console.log("generateToken Payload:", payload);
+  
   // 簽名 token
   return jsonWebToken.sign(payload, process.env.JWT_SECRET || '', {
     expiresIn: process.env.JWT_EXPIRES_DAY || '7d'

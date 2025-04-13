@@ -89,6 +89,16 @@ export const checkRequestBodyValidator = (req: Request, _res: Response, next: Ne
             throw new Error('密碼需至少 8 碼以上，並英數混合');
           }
           break;
+        case 'phone':
+          if (_value && !validator.isMobilePhone(_value, 'zh-TW')) {
+            throw new Error('電話格式不正確，請使用台灣手機號碼格式');
+          }
+          break;
+        case 'birthday':
+          if (_value && !validator.isISO8601(_value)) {
+            throw new Error('生日格式不正確，請使用YYYY-MM-DD格式');
+          }
+          break;
         case 'image':
           if (!validator.isURL(_value, { protocols: ['https'] })) {
             throw new Error('image 格式不正確');

@@ -54,24 +54,12 @@ export class User extends Model {
     allowNull: true,
     validate: {
       len: {
-        args: [1, 20],
-        msg: '名字不能超過20個字符'
+        args: [1, 40],
+        msg: '姓名不能超過40個字符'
       }
     }
   })
-  firstName?: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-    validate: {
-      len: {
-        args: [1, 20],
-        msg: '姓氏不能超過20個字符'
-      }
-    }
-  })
-  lastName?: string;
+  name?: string;
 
   @Column({
     type: DataType.STRING,

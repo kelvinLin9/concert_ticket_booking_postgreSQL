@@ -2,13 +2,6 @@ import { Router } from 'express';
 import {
   check,
 } from '../controller/user';
-import { googleLogin } from '../controller/auth';
-import { checkRequestBodyValidator, isAuth } from '../middlewares/index';
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import dotenv from 'dotenv';
-dotenv.config();
-import { User } from '../models';
 import { handleErrorAsync } from '../statusHandle/handleErrorAsync';
 import { 
   login,
@@ -16,8 +9,15 @@ import {
   verifyEmail, 
   resendVerification, 
   requestPasswordReset, 
-  resetPassword 
-} from '../controller/auth.controller';
+  resetPassword,
+  googleLogin
+} from '../controller/auth';
+import { checkRequestBodyValidator, isAuth } from '../middlewares/index';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import dotenv from 'dotenv';
+dotenv.config();
+import { User } from '../models';
 import { Request, Response } from 'express';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/email';
 
@@ -33,14 +33,6 @@ passport.use(new GoogleStrategy({
 },
 async function (req, accessToken, refreshToken, profile, done) {
   try {
-    console.log('Google Profile:', {
-      id: profile.id,
-      displayName: profile.displayName,
-      emails: profile.emails,
-      photos: profile.photos,
-      _json: profile._json
-    });
-
     // 先尋找是否有使用 Google 登入的用戶
     let user = await User.findOne({
       where: {
@@ -147,10 +139,8 @@ async function (req, accessToken, refreshToken, profile, done) {
       }
     };
     
-    console.log('User Data being sent:', userData);
     return done(null, userData);
   } catch (err) {
-    console.error('Google Strategy Error:', err);
     return done(err);
   }
 }));
@@ -238,7 +228,6 @@ router.post('/test-email', handleErrorAsync(async (req: Request, res: Response) 
       code // 在測試環境中返回驗證碼
     });
   } catch (error) {
-    console.error('測試郵件發送失敗:', error);
     res.status(500).json({
       status: 'fail',
       message: '郵件發送失敗',

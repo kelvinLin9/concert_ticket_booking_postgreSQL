@@ -1,9 +1,26 @@
+/**
+ * User 模型 - 使用 Sequelize ORM
+ * 
+ * 本文件定義使用者實體及其行為。
+ * 
+ * 若遷移至 TypeORM，需要將此模型重構為:
+ * 1. 使用 @Entity() 代替 @Table()
+ * 2. 使用 @PrimaryGeneratedColumn() 代替 @Column() 作為主鍵
+ * 3. 關聯使用 @OneToMany(), @ManyToOne() 等代替 HasMany 
+ * 4. 生命週期鉤子使用 @BeforeInsert(), @BeforeUpdate() 等裝飾器
+ * 5. 轉換為 Repository 模式而非靜態方法
+ */
+
 import {
   Table, Column, Model, DataType, BeforeCreate, BeforeUpdate, HasMany
 } from 'sequelize-typescript';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
+/**
+ * OAuth 提供者介面
+ * TypeORM 中可以定義為嵌套實體或獨立實體
+ */
 interface IOAuthProvider {
   provider: string;
   providerId: string;
@@ -12,10 +29,13 @@ interface IOAuthProvider {
   tokenExpiresAt?: Date;
 }
 
+/**
+ * 使用者模型 - 定義資料庫表結構和行為
+ */
 @Table({
   tableName: 'users',
   timestamps: true,
-  paranoid: true
+  paranoid: true // 軟刪除功能 (TypeORM 使用 @DeleteDateColumn 實現)
 })
 export class User extends Model {
   @Column({
@@ -23,7 +43,7 @@ export class User extends Model {
     defaultValue: DataType.UUIDV4,
     primaryKey: true
   })
-  id!: string;
+  id!: string; // TypeORM: @PrimaryGeneratedColumn("uuid")
 
   @Column({
     type: DataType.STRING,
@@ -35,7 +55,7 @@ export class User extends Model {
       }
     }
   })
-  email!: string;
+  email!: string; // TypeORM: @Column({ unique: true })
 
   @Column({
     type: DataType.STRING,
@@ -47,7 +67,7 @@ export class User extends Model {
       }
     }
   })
-  password?: string;
+  password?: string; // TypeORM: @Column({ select: false }) 可隱藏敏感欄位
 
   @Column({
     type: DataType.STRING,
@@ -59,7 +79,7 @@ export class User extends Model {
       }
     }
   })
-  name?: string;
+  name?: string; // TypeORM: @Column()
 
   @Column({
     type: DataType.STRING,
@@ -191,13 +211,20 @@ export class User extends Model {
     allowNull: false,
     defaultValue: []
   })
-  oauthProviders!: IOAuthProvider[];
+  oauthProviders!: IOAuthProvider[]; // TypeORM: 可使用 @OneToMany() 關聯到獨立實體
 
-  // 實例方法
+  /**
+   * 檢查用戶是否有特定 OAuth 提供者
+   * TypeORM: 可以在 Repository 或實體方法中實現
+   */
   hasOAuthProvider(provider: string): boolean {
     return this.oauthProviders.some(p => p.provider === provider);
   }
 
+  /**
+   * 添加或更新 OAuth 提供者信息
+   * TypeORM: 可以使用 Repository 方法實現，或擴展實體 
+   */
   addOAuthProvider(
     provider: string,
     providerId: string,
@@ -224,6 +251,10 @@ export class User extends Model {
     }
   }
 
+  /**
+   * 創建電子郵件驗證令牌
+   * TypeORM: 可以使用實體實例方法或在服務層實現
+   */
   async createVerificationToken(): Promise<{ token: string, code: string }> {
     const token = crypto.randomBytes(32).toString('hex');
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 生成6位數驗證碼
@@ -236,6 +267,10 @@ export class User extends Model {
     return { token, code };
   }
 
+  /**
+   * 創建密碼重置令牌
+   * TypeORM: 可以使用實體實例方法或在服務層實現
+   */
   async createPasswordResetToken(): Promise<{ token: string, code: string }> {
     const token = crypto.randomBytes(32).toString('hex');
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 生成6位數驗證碼
@@ -248,6 +283,10 @@ export class User extends Model {
     return { token, code };
   }
 
+  /**
+   * 密碼加密處理 - 生命週期鉤子
+   * TypeORM: 使用 @BeforeInsert() 和 @BeforeUpdate() 裝飾器
+   */
   @BeforeCreate
   @BeforeUpdate
   static async hashPassword(instance: User) {
@@ -258,6 +297,10 @@ export class User extends Model {
     }
   }
 
+  /**
+   * 比較密碼是否匹配
+   * TypeORM: 可以實現為實體方法
+   */
   async comparePassword(candidatePassword: string): Promise<boolean> {
     if (!this.password) return false;
     return bcrypt.compare(candidatePassword, this.password);

@@ -36,6 +36,17 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   try {
     const { email, password, name, nickname, phone, birthday } = req.body;
 
+    // 檢查必要參數
+    if (!email) {
+      throw createHttpError(400, 'Email 為必填欄位');
+    }
+    if (!password) {
+      throw createHttpError(400, '密碼為必填欄位');
+    }
+    if (!name) {
+      throw createHttpError(400, '姓名為必填欄位');
+    }
+    
     // 檢查 email 是否已經被註冊
     const existingUser = await User.findOne({
       where: { email }
@@ -97,8 +108,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      throw createHttpError(400, 'Email 和密碼為必填欄位');
+    // 檢查必要參數
+    if (!email) {
+      throw createHttpError(400, 'Email 為必填欄位');
+    }
+    
+    if (!password) {
+      throw createHttpError(400, '密碼為必填欄位');
     }
 
     // 查找用戶
@@ -148,10 +164,24 @@ export const googleLogin = handleErrorAsync(async (req: Request, res: Response, 
   const googleReq = req as GoogleRequest;
 
   // 檢查必要的用戶數據
-  if (!googleReq.user || !googleReq.user.user || !googleReq.user.user.id) {
+  if (!googleReq.user) {
     return res.status(400).json({
-      status: 'fail',
-      error: { message: 'Invalid user data' }
+      status: 'failed',
+      message: '未收到 Google 用戶資料'
+    });
+  }
+  
+  if (!googleReq.user.user) {
+    return res.status(400).json({
+      status: 'failed',
+      message: '無效的 Google 用戶資料格式'
+    });
+  }
+  
+  if (!googleReq.user.user.id) {
+    return res.status(400).json({
+      status: 'failed',
+      message: '未找到用戶識別碼'
     });
   }
 
@@ -183,7 +213,11 @@ export const googleLogin = handleErrorAsync(async (req: Request, res: Response, 
   if (req.method === 'POST') {
     return res.json({
       status: 'success',
-      token: token
+      message: '登入成功',
+      data: {
+        token,
+        user: userData
+      }
     });
   }
 
@@ -197,8 +231,13 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
   try {
     const { email, code } = req.body;
 
-    if (!email || !code) {
-      throw createHttpError(400, '缺少必要參數');
+    // 檢查必要參數
+    if (!email) {
+      throw createHttpError(400, 'Email 為必填欄位');
+    }
+    
+    if (!code) {
+      throw createHttpError(400, '驗證碼為必填欄位');
     }
 
     // 查找用戶
@@ -239,8 +278,9 @@ export const resendVerification = async (req: Request, res: Response, next: Next
   try {
     const { email } = req.body;
 
+    // 檢查必要參數
     if (!email) {
-      throw createHttpError(400, '缺少 Email 參數');
+      throw createHttpError(400, 'Email 為必填欄位');
     }
 
     // 查找用戶
@@ -283,8 +323,9 @@ export const requestPasswordReset = async (req: Request, res: Response, next: Ne
   try {
     const { email } = req.body;
 
+    // 檢查必要參數
     if (!email) {
-      throw createHttpError(400, '缺少 Email 參數');
+      throw createHttpError(400, 'Email 為必填欄位');
     }
 
     // 查找用戶
@@ -316,8 +357,17 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
   try {
     const { email, code, newPassword } = req.body;
 
-    if (!email || !code || !newPassword) {
-      throw createHttpError(400, '缺少必要參數');
+    // 檢查必要參數
+    if (!email) {
+      throw createHttpError(400, 'Email 為必填欄位');
+    }
+    
+    if (!code) {
+      throw createHttpError(400, '驗證碼為必填欄位');
+    }
+    
+    if (!newPassword) {
+      throw createHttpError(400, '新密碼為必填欄位');
     }
 
     // 查找用戶

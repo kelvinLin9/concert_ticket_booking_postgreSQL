@@ -29,7 +29,7 @@ router.get('/profile', isAuth, handleErrorAsync(async (req: Request, res: Respon
 
   if (!user) {
     return res.status(404).json({
-      status: 'fail',
+      status: 'failed',
       message: '找不到用戶資料'
     });
   }

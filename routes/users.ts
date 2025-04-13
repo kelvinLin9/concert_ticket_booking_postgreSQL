@@ -1,6 +1,5 @@
 import express from 'express';
 import {
-  getUser,
   updateInfo,
   updateRole,
 } from '../controller/user';

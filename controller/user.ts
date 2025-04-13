@@ -135,7 +135,7 @@ const updateInfo = async (req: Request, res: Response, next: NextFunction) => {
 
     res.status(200).json({
       status: 'success',
-      message: '',
+      message: '成功修改用戶資料',
       data: {
         user: updatedUser
       }

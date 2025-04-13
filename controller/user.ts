@@ -85,8 +85,7 @@ const updateInfo = async (req: Request, res: Response, next: NextFunction) => {
 
     const userId = customReq.user.userId;
     const { 
-      firstName, 
-      lastName, 
+      name,
       nickname, 
       email, 
       phone, 
@@ -102,8 +101,7 @@ const updateInfo = async (req: Request, res: Response, next: NextFunction) => {
     const updatedFields: any = {};
 
     // 只更新有提供的欄位
-    if (firstName !== undefined) updatedFields.firstName = firstName;
-    if (lastName !== undefined) updatedFields.lastName = lastName;
+    if (name !== undefined) updatedFields.name = name;
     if (nickname !== undefined) updatedFields.nickname = nickname;
     if (email !== undefined) updatedFields.email = email;
     if (phone !== undefined) updatedFields.phone = phone;
@@ -161,8 +159,7 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     if (search) {
       filterBy[Op.or] = [
         { email: { [Op.iLike]: `%${search}%` } },
-        { firstName: { [Op.iLike]: `%${search}%` } },
-        { lastName: { [Op.iLike]: `%${search}%` } },
+        { name: { [Op.iLike]: `%${search}%` } },
         { nickname: { [Op.iLike]: `%${search}%` } }
       ];
     }
@@ -253,8 +250,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     }
     
     const { 
-      firstName, 
-      lastName, 
+      name, 
       nickname, 
       email, 
       phone, 
@@ -271,8 +267,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     const updatedFields: any = {};
 
     // 只更新有提供的欄位
-    if (firstName !== undefined) updatedFields.firstName = firstName;
-    if (lastName !== undefined) updatedFields.lastName = lastName;
+    if (name !== undefined) updatedFields.name = name;
     if (nickname !== undefined) updatedFields.nickname = nickname;
     if (email !== undefined) updatedFields.email = email;
     if (phone !== undefined) updatedFields.phone = phone;

@@ -41,7 +41,7 @@ if (process.env.DATABASE_URL) {
     database: DB_NAME,
     username: DB_USER,
     password: DB_PASSWORD,
-    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    logging: false,
     define: {
       timestamps: true,
       underscored: false,

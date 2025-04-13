@@ -13,9 +13,7 @@ export const getTransporter = async () => {
       auth: {
         user: EMAILER_USER,
         pass: EMAILER_PASSWORD
-      },
-      debug: true, // 開啟除錯模式
-      logger: true  // 開啟日誌
+      }
     });
 
     // 驗證連接

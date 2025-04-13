@@ -337,6 +337,13 @@ export const requestPasswordReset = async (req: Request, res: Response, next: Ne
       throw createHttpError(404, '找不到使用者');
     }
 
+    // 檢查是否在10分鐘內已經發送過重置郵件
+    const lastAttempt = user.lastPasswordResetAttempt;
+    if (lastAttempt && new Date().getTime() - lastAttempt.getTime() < 10 * 60 * 1000) {
+      const remainingSeconds = Math.ceil((10 * 60 * 1000 - (new Date().getTime() - lastAttempt.getTime())) / 1000);
+      throw createHttpError(429, `請等 ${remainingSeconds} 秒後再試`);
+    }
+
     // 生成密碼重置碼
     const { token, code } = await user.createPasswordResetToken();
 

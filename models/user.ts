@@ -179,6 +179,12 @@ export class User extends Model {
   lastVerificationAttempt?: Date;
 
   @Column({
+    type: DataType.DATE,
+    allowNull: true
+  })
+  lastPasswordResetAttempt?: Date;
+
+  @Column({
     type: DataType.JSONB,
     allowNull: false,
     defaultValue: []
@@ -234,7 +240,8 @@ export class User extends Model {
 
     this.passwordResetToken = token;
     this.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10分鐘後過期
-    await this.save({ fields: ['passwordResetToken', 'passwordResetExpires'] });
+    this.lastPasswordResetAttempt = new Date(); // 記錄本次嘗試時間
+    await this.save({ fields: ['passwordResetToken', 'passwordResetExpires', 'lastPasswordResetAttempt'] });
 
     return { token, code };
   }

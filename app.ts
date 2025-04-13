@@ -65,12 +65,12 @@ app.use((err: Error & {
   // 添加任何其他可能的自定義屬性
   [key: string]: any
 }, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('應用錯誤:', err);
-  console.error('錯誤類型:', err.constructor.name);
-  console.error('錯誤名稱:', err.name);
-  console.error('錯誤堆棧:', err.stack);
-  console.error('isOperational:', err.isOperational);
-  console.error('錯誤屬性:', Object.keys(err));
+  // console.error('應用錯誤:', err);
+  // console.error('錯誤類型:', err.constructor.name);
+  // console.error('錯誤名稱:', err.name);
+  // console.error('錯誤堆棧:', err.stack);
+  // console.error('isOperational:', err.isOperational);
+  // console.error('錯誤屬性:', Object.keys(err));
   
   const statusCode = err.status || 500;
   

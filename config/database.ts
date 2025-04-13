@@ -143,6 +143,10 @@ export const connectToDatabase = async () => {
         await sequelize.sync({ alter: true }); // 智能更新表結構，保留資料
         console.log('資料庫表已更新 (保留數據)');
       }
+    } else if (process.env.NODE_ENV === 'production') {
+      // 在生產環境中執行一次同步，以確保所有表都存在
+      await sequelize.sync();
+      console.log('生產環境: 資料庫表已同步');
     }
   } catch (error) {
     console.error('資料庫連接失敗:', error);

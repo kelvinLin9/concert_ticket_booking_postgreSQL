@@ -107,14 +107,16 @@ export class User extends Model {
   @Column({
     type: DataType.ARRAY(DataType.STRING),
     allowNull: true,
-    defaultValue: []
+    defaultValue: [],
+    comment: '可選值: 北部, 南部, 東部, 中部, 離島, 海外'
   })
   preferredRegions?: string[];
 
   @Column({
     type: DataType.ARRAY(DataType.STRING),
     allowNull: true,
-    defaultValue: []
+    defaultValue: [],
+    comment: '可選值: 流行音樂, 搖滾, 電子音樂, 嘻哈, 爵士藍調, 古典音樂, 其他'
   })
   preferredEventTypes?: string[];
 

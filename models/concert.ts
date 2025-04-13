@@ -40,7 +40,7 @@ export class Concert extends Model {
   description!: string;
 
   @Column({
-    type: DataType.ENUM('pop', 'rock', 'electronic', 'hip-hop', 'jazz-blues', 'classical', 'other'),
+    type: DataType.ENUM('流行音樂', '搖滾', '電子音樂', '嘻哈', '爵士藍調', '古典音樂', '其他'),
     allowNull: false,
     validate: {
       notEmpty: {
@@ -126,7 +126,7 @@ export class Concert extends Model {
   soldTickets!: number;
 
   @Column({
-    type: DataType.ENUM('north', 'south', 'east', 'central', 'offshore', 'overseas'),
+    type: DataType.ENUM('北部', '南部', '東部', '中部', '離島', '海外'),
     allowNull: false
   })
   region!: string;

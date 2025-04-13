@@ -50,12 +50,14 @@ module.exports = {
       preferred_regions: {
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: true,
-        defaultValue: []
+        defaultValue: [],
+        comment: '可選值: 北部, 南部, 東部, 中部, 離島, 海外'
       },
       preferred_event_types: {
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: true,
-        defaultValue: []
+        defaultValue: [],
+        comment: '可選值: 流行音樂, 搖滾, 電子音樂, 嘻哈, 爵士藍調, 古典音樂, 其他'
       },
       country: {
         type: Sequelize.STRING,
@@ -201,7 +203,7 @@ module.exports = {
         allowNull: false
       },
       region: {
-        type: Sequelize.ENUM('north', 'south', 'east', 'central', 'offshore', 'overseas'),
+        type: Sequelize.ENUM('北部', '南部', '東部', '中部', '離島', '海外'),
         allowNull: false
       },
       capacity: {
@@ -253,7 +255,7 @@ module.exports = {
         allowNull: false
       },
       concert_type: {
-        type: Sequelize.ENUM('pop', 'rock', 'electronic', 'hip-hop', 'jazz-blues', 'classical', 'other'),
+        type: Sequelize.ENUM('流行音樂', '搖滾', '電子音樂', '嘻哈', '爵士藍調', '古典音樂', '其他'),
         allowNull: false
       },
       image: {
@@ -304,7 +306,7 @@ module.exports = {
         defaultValue: 0
       },
       region: {
-        type: Sequelize.ENUM('north', 'south', 'east', 'central', 'offshore', 'overseas'),
+        type: Sequelize.ENUM('北部', '南部', '東部', '中部', '離島', '海外'),
         allowNull: false
       },
       featured: {

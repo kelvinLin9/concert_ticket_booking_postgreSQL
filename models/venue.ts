@@ -44,7 +44,7 @@ export class Venue extends Model {
   address!: string;
 
   @Column({
-    type: DataType.ENUM('north', 'south', 'east', 'central', 'offshore', 'overseas'),
+    type: DataType.ENUM('北部', '南部', '東部', '中部', '離島', '海外'),
     allowNull: false,
     validate: {
       notEmpty: {

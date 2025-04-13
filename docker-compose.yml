@@ -10,11 +10,11 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
-      - DB_HOST=postgres
+      - DB_HOST=postgresdb
       - DB_PORT=5432
-      - DB_NAME=concert_ticket_booking
+      - DB_NAME=Tickeasy
       - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_PASSWORD=G7dR#9pL2q$xB5fT6hZ
     volumes:
       # 掛載源代碼（開發環境使用）
       - ./:/app
@@ -24,9 +24,9 @@ services:
       - /app/dist
     command: sh -c "npm install --ignore-scripts && ./node_modules/.bin/tsc --watch & nodemon --watch dist dist/bin/server.js"
     depends_on:
-      - postgres
+      - postgresdb
   
-  postgres:
+  postgresdb:
     image: postgres:16
     ports:
       - "5432:5432"
@@ -34,8 +34,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=concert_ticket_booking
+      - POSTGRES_PASSWORD=G7dR#9pL2q$xB5fT6hZ
+      - POSTGRES_DB=Tickeasy
 
 volumes:
   postgres_data: 

@@ -32,8 +32,11 @@ const checkAuthStatus = async (req: Request, res: Response, next: NextFunction) 
     // 直接返回 userId 和 role，不再查詢完整的用戶資料
     res.status(200).json({
       status: 'success',
-      userId: customReq.user.userId,
-      role: customReq.user.role
+      message: '',
+      data: {
+        userId: customReq.user.userId,
+        role: customReq.user.role
+      }
     });
   } catch (err) {
     next(err);

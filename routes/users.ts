@@ -36,7 +36,10 @@ router.get('/profile', isAuth, handleErrorAsync(async (req: Request, res: Respon
 
   res.json({
     status: 'success',
-    user
+    message: '用戶資料獲取成功',
+    data: {
+      user
+    }
   });
 }));
 

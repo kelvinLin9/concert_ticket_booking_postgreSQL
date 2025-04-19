@@ -1,7 +1,50 @@
 import { Request, Response } from 'express';
 import { Organization } from '../models/organization';
 import { v4 as uuidv4 } from 'uuid';
-import { NotFoundError, ValidationError, ServerError } from '../statusHandle/error';
+
+// 擴展Express的Request介面，添加用戶屬性
+declare module 'express' {
+  interface User {
+    id: string;
+    role?: 'user' | 'admin' | 'superuser';
+  }
+  
+  export interface Request {
+    user?: User;
+  }
+}
+
+// 定義錯誤類型（如果無法引入）
+class AppError extends Error {
+  status: number;
+  isOperational: boolean;
+  
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.status = statusCode;
+    this.isOperational = true;
+    
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(message: string) {
+    super(message, 404);
+  }
+}
+
+class ValidationError extends AppError {
+  constructor(message: string) {
+    super(message, 400);
+  }
+}
+
+class ServerError extends AppError {
+  constructor(message: string) {
+    super(message, 500);
+  }
+}
 
 /**
  * 查詢所有組織
@@ -10,7 +53,8 @@ export const getAllOrganizations = async (req: Request, res: Response): Promise<
   try {
     const organizations = await Organization.findAll();
     res.status(200).json({
-      success: true,
+      status: "success",
+      message: "成功取得所有組織資料",
       data: organizations
     });
   } catch (error) {
@@ -33,7 +77,8 @@ export const getOrganizationById = async (req: Request, res: Response): Promise<
     }
 
     res.status(200).json({
-      success: true,
+      status: "success",
+      message: "成功取得組織資料",
       data: organization
     });
   } catch (error) {
@@ -83,7 +128,8 @@ export const createOrganization = async (req: Request, res: Response): Promise<v
     });
 
     res.status(201).json({
-      success: true,
+      status: "success",
+      message: "成功創建組織",
       data: newOrganization
     });
   } catch (error) {
@@ -154,7 +200,8 @@ export const updateOrganization = async (req: Request, res: Response): Promise<v
     });
 
     res.status(200).json({
-      success: true,
+      status: "success",
+      message: "成功更新組織資料",
       data: updatedOrganization
     });
   } catch (error) {
@@ -193,8 +240,9 @@ export const deleteOrganization = async (req: Request, res: Response): Promise<v
     await organization.destroy();
 
     res.status(200).json({
-      success: true,
-      message: '組織已成功刪除'
+      status: "success",
+      message: "成功刪除組織",
+      data: null
     });
   } catch (error) {
     if (error instanceof NotFoundError || error instanceof ValidationError) {
@@ -220,7 +268,8 @@ export const getMyOrganizations = async (req: Request, res: Response): Promise<v
     });
 
     res.status(200).json({
-      success: true,
+      status: "success",
+      message: "成功取得用戶所屬組織資料",
       data: organizations
     });
   } catch (error) {

@@ -1,7 +1,7 @@
 import {
   Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany
 } from 'sequelize-typescript';
-import { Organizer } from './organizer';
+import { Organization } from './organization';
 import { Venue } from './venue';
 
 @Table({
@@ -80,15 +80,15 @@ export class Concert extends Model {
   })
   status!: string;
 
-  @ForeignKey(() => Organizer)
+  @ForeignKey(() => Organization)
   @Column({
     type: DataType.UUID,
     allowNull: false
   })
-  organizerId!: string;
+  organizationId!: string;
 
-  @BelongsTo(() => Organizer)
-  organizer!: Organizer;
+  @BelongsTo(() => Organization)
+  organization!: Organization;
 
   @ForeignKey(() => Venue)
   @Column({

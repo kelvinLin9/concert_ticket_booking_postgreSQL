@@ -1,6 +1,6 @@
 import sequelize from '../config/database';
 import { User } from './user';
-import { Organizer } from './organizer';
+import { Organization } from './organization';
 import { Venue } from './venue';
 import { Concert } from './concert';
 import { Ticket } from './ticket';
@@ -10,7 +10,7 @@ import { Payment } from './payment';
 // 註冊所有模型
 const models = [
   User,
-  Organizer,
+  Organization,
   Venue,
   Concert,
   Ticket,
@@ -22,7 +22,7 @@ sequelize.addModels(models);
 
 export {
   User,
-  Organizer,
+  Organization,
   Venue,
   Concert,
   Ticket,
@@ -33,7 +33,7 @@ export {
 export default {
   sequelize,
   User,
-  Organizer,
+  Organization,
   Venue,
   Concert,
   Ticket,

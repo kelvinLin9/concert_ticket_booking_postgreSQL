@@ -26,19 +26,22 @@ Table User {
   oauthProviders JSON [note: "嵌入式 OAuth 提供者資訊"]
 }
 
-// Organizer Model
-Table Organizer {
-  _id ObjectId [pk]
-  companyName String [not null, note: "公司名稱"]
-  companyAddress String [not null, note: "公司地址"]
-  website String [null, note: "公司網站"]
-  contactPerson JSON [not null, note: "嵌入式聯絡人資訊"]
-  userId ObjectId [not null]
-  status String [not null, default: "active", note: "active, inactive, blocked"]
-  verificationStatus String [not null, default: "unverified", note: "unverified, pending, verified"]
-  createdAt DateTime [not null]
-  updatedAt DateTime [not null]
-  createdConcerts ObjectId[] [note: "引用的 Concert ID 列表"]
+// Organization Model
+Table Organization {
+  organizationId uuid [pk, note: "公司 ID"]
+  userId uuid [not null, ref: > User.id, note: "所屬使用者 ID"]
+  orgName varchar(100) [not null, note: "公司名稱"]
+  orgAddress varchar(100) [not null, note: "公司地址"]
+  orgMail varchar(100) [note: "公司電子郵件"]
+  orgContact varchar(1000) [note: "聯絡人資訊"]
+  orgMobile varchar(200) [note: "行動電話"]
+  orgPhone varchar(200) [note: "市話電話"] 
+  orgWebsite varchar(200) [note: "公司網站"]
+  status enum [not null, default: "active", note: "active, inactive, blocked"]
+  verificationStatus enum [not null, default: "unverified", note: "unverified, pending, verified"]
+  createdAt timestamp [not null, note: "公司建立時間"]
+  updatedAt timestamp [not null, note: "最後更新時間"]
+  deletedAt timestamp [note: "軟刪除時間"]
 }
 
 // Concert Model (活動/演唱會)
@@ -51,7 +54,7 @@ Table Concert {
   startDate DateTime [not null, note: "活動開始時間"]
   endDate DateTime [not null, note: "活動結束時間"]
   status String [not null, default: "draft", note: "draft/published/canceled/completed"]
-  organizerId ObjectId [not null, note: "主辦方"]
+  organizationId uuid [not null, ref: > Organization.organizationId, note: "主辦方"]
   venueId ObjectId [not null, note: "場地"]
   totalTickets Number [not null, note: "總票數"]
   soldTickets Number [not null, default: 0, note: "已售票數"]
@@ -126,8 +129,8 @@ Table Payment {
 }
 
 // References
-Ref: Organizer.userId > User._id
-Ref: Concert.organizerId > Organizer._id
+Ref: Organization.userId > User.id
+Ref: Concert.organizationId > Organization.organizationId
 Ref: Concert.venueId > Venue._id
 Ref: Ticket.concertId > Concert._id
 Ref: Order.userId > User._id
@@ -136,7 +139,7 @@ Ref: Payment.orderId > Order._id
 
 // Notes
 // 1. 在 MongoDB 中，oauthProviders 是嵌入在 User 文檔中的，使用 JSON 類型表示
-// 2. contactPerson 是嵌入在 Organizer 文檔中的，使用 JSON 類型表示
+// 2. 聯絡人資訊現在以文本欄位存儲在 Organization 表中
 // 3. tickets 是嵌入在 Order 文檔中的，包含票券詳細資訊
 // 4. paymentInfo 是嵌入在 Order 文檔中的，包含支付基本資訊
 // 5. contactInfo 在不同模型中使用，是嵌入式文檔 

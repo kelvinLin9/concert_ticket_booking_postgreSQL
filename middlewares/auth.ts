@@ -1,25 +1,18 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import { Request, Response, NextFunction } from 'express';
-
-interface CustomRequest extends Request {
-  user?: any;
-  token?: string;
-}
+import { CustomRequest } from './index';
 
 interface JwtPayload {
   id: string;
 }
 
-// 定義Express的User接口擴展
-declare global {
-  namespace Express {
-    interface User {
-      id: string;
-      role: string;
-      email: string;
-    }
-  }
+// 自定義用於模型的類型
+interface UserModel {
+  id: string;
+  role: string;
+  email: string;
+  [key: string]: any;
 }
 
 /**
@@ -55,7 +48,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     }
 
     // 查找用戶
-    const user = await User.findByPk(decoded.id);
+    const user = await User.findByPk(decoded.id) as unknown as UserModel;
     if (!user) {
       return res.status(401).json({
         status: 'failed',
@@ -63,8 +56,8 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
       });
     }
 
-    // 在請求對象中設置用戶信息
-    req.user = {
+    // 在請求對象中設置用戶信息（使用 any 類型暫時繞過類型檢查）
+    (req as any).user = {
       id: user.id,
       role: user.role,
       email: user.email
@@ -107,13 +100,13 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     }
 
     // 查找用戶
-    const user = await User.findByPk(decoded.id);
+    const user = await User.findByPk(decoded.id) as unknown as UserModel;
     if (!user) {
       return next();
     }
 
-    // 在請求對象中設置用戶信息
-    req.user = {
+    // 在請求對象中設置用戶信息（使用 any 類型暫時繞過類型檢查）
+    (req as any).user = {
       id: user.id,
       role: user.role,
       email: user.email
@@ -158,7 +151,9 @@ export const isOrganizer = (req: Request, res: Response, next: NextFunction) => 
     });
   }
 
-  if (req.user.role !== 'admin' && req.user.role !== 'organizer') {
+  // 使用 as string 轉換類型，解決比較問題
+  const role = req.user.role as string;
+  if (role !== 'admin' && role !== 'organizer') {
     return res.status(403).json({
       status: 'failed',
       message: '需要組織管理員權限',
@@ -170,8 +165,8 @@ export const isOrganizer = (req: Request, res: Response, next: NextFunction) => 
 
 export const adminAuth = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    await isAuthenticated(req, res, () => {
-      if (req.user.role !== 'admin' && req.user.role !== 'superuser') {
+    await isAuthenticated(req as Request, res, () => {
+      if (req.user && (req.user.role !== 'admin' && req.user.role !== 'superuser')) {
         return res.status(403).json({ 
           status: 'failed',
           message: '權限不足',
@@ -189,12 +184,16 @@ export const adminAuth = async (req: CustomRequest, res: Response, next: NextFun
 
 export const teacherAuth = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    await isAuthenticated(req, res, () => {
-      if (req.user.role !== 'teacher' && req.user.role !== 'admin' && req.user.role !== 'superuser') {
-        return res.status(403).json({ 
-          status: 'failed',
-          message: '權限不足',
-        });
+    await isAuthenticated(req as Request, res, () => {
+      if (req.user) {
+        // 使用 as string 轉換類型，解決比較問題
+        const role = req.user.role as string;
+        if (role !== 'teacher' && role !== 'admin' && role !== 'superuser') {
+          return res.status(403).json({ 
+            status: 'failed',
+            message: '權限不足',
+          });
+        }
       }
       next();
     });

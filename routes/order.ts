@@ -1,6 +1,7 @@
 import express from 'express';
 import { isAuthenticated, optionalAuth } from '../middlewares/auth';
 import orderController from '../controller/order';
+import { routeHandler, authMiddleware } from '../middlewares/routeWrapper';
 
 const router = express.Router();
 
@@ -29,7 +30,7 @@ const router = express.Router();
  *       201:
  *         description: 訂單創建成功
  */
-router.post('/', optionalAuth, orderController.createOrder);
+router.post('/', authMiddleware(optionalAuth), routeHandler(orderController.createOrder));
 
 /**
  * @swagger
@@ -52,7 +53,7 @@ router.post('/', optionalAuth, orderController.createOrder);
  *       200:
  *         description: 獲取訂單成功
  */
-router.get('/:orderId', optionalAuth, orderController.getOrderById);
+router.get('/:orderId', authMiddleware(optionalAuth), routeHandler(orderController.getOrderById));
 
 /**
  * @swagger
@@ -92,7 +93,7 @@ router.get('/:orderId', optionalAuth, orderController.getOrderById);
  *       200:
  *         description: 訂單更新成功
  */
-router.put('/:orderId', optionalAuth, orderController.updateOrder);
+router.put('/:orderId', authMiddleware(optionalAuth), routeHandler(orderController.updateOrder));
 
 /**
  * @swagger
@@ -115,6 +116,6 @@ router.put('/:orderId', optionalAuth, orderController.updateOrder);
  *       200:
  *         description: 訂單取消成功
  */
-router.put('/:orderId/cancel', optionalAuth, orderController.cancelOrder);
+router.put('/:orderId/cancel', authMiddleware(optionalAuth), routeHandler(orderController.cancelOrder));
 
 export default router; 

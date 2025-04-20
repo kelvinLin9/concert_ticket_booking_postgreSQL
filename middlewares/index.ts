@@ -3,11 +3,10 @@ import validator from 'validator';
 import { verifyToken } from '../utils/index';
 import { Request, Response, NextFunction } from 'express';
 
-export interface CustomRequest extends Request {
-  user?: {
-    userId: string;
-    role: string;
-  };
+// 擴展 Request 類型，使用 any 類型避免類型檢查錯誤
+export interface CustomRequest extends Omit<Request, 'user'> {
+  user?: any;
+  token?: string;
 }
 
 // token 驗證
@@ -21,10 +20,14 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
     if (!('userId' in decoded) || !('role' in decoded)) {
       throw createHttpError(401, '無效的 Token 格式');
     }
-    (req as CustomRequest).user = {
+    
+    // 使用類型斷言處理類型不兼容問題
+    (req as any).user = {
       userId: decoded.userId,
+      id: decoded.userId, // 添加 id 屬性與 userId 保持一致
       role: decoded.role
     };
+    
     console.log('req.user:', decoded);
     next();
   } catch (error) {
@@ -34,7 +37,8 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
 
 // 實作管理員權限（這部分需要後續完善）
 export const isAdmin = async (req: CustomRequest, res: Response, next: NextFunction) => {
-  isAuth(req, res, async (err) => {
+  // 使用類型斷言處理類型不兼容問題
+  isAuth(req as Request, res, async (err) => {
     if (err) {
       return next(err); // 如果認證中間件遇到錯誤，直接將錯誤傳遞下去
     }

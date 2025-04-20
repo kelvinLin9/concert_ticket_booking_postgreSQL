@@ -1,15 +1,29 @@
 import express from 'express';
 import { isAuthenticated, optionalAuth } from '../middlewares/auth';
 import paymentController from '../controller/payment';
+import { routeHandler, authMiddleware } from '../middlewares/routeWrapper';
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/payments:
+ * /api/v1/payments/{orderId}:
  *   post:
  *     summary: 創建支付請求
  *     tags: [Payments]
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 訂單ID
+ *       - in: query
+ *         name: lockToken
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 訂單鎖定令牌
  *     requestBody:
  *       required: true
  *       content:
@@ -17,16 +31,8 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - orderId
  *               - method
- *               - lockToken
  *             properties:
- *               orderId:
- *                 type: string
- *                 description: 訂單ID
- *               lockToken:
- *                 type: string
- *                 description: 訂單鎖定令牌
  *               method:
  *                 type: string
  *                 description: 支付方式
@@ -37,7 +43,7 @@ const router = express.Router();
  *       201:
  *         description: 支付請求創建成功
  */
-router.post('/', optionalAuth, paymentController.createPayment);
+router.post('/:orderId', authMiddleware(optionalAuth), routeHandler(paymentController.createPayment));
 
 /**
  * @swagger
@@ -61,7 +67,7 @@ router.post('/', optionalAuth, paymentController.createPayment);
  *       200:
  *         description: 支付回調處理成功
  */
-router.post('/:paymentId/callback', paymentController.handlePaymentCallback);
+router.post('/:paymentId/callback', routeHandler(paymentController.handlePaymentCallback));
 
 /**
  * @swagger
@@ -79,6 +85,6 @@ router.post('/:paymentId/callback', paymentController.handlePaymentCallback);
  *       200:
  *         description: 獲取支付詳情成功
  */
-router.get('/:paymentId', optionalAuth, paymentController.getPaymentDetails);
+router.get('/:paymentId', authMiddleware(optionalAuth), routeHandler(paymentController.getPaymentDetails));
 
 export default router; 

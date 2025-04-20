@@ -29,7 +29,10 @@ export class Order extends Model {
   })
   ticketTypeId!: string;
 
-  @BelongsTo(() => TicketType)
+  @BelongsTo(() => TicketType, {
+    onDelete: 'CASCADE',
+    hooks: true
+  })
   ticketType!: TicketType;
 
   @ForeignKey(() => User)

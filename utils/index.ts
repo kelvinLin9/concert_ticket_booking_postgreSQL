@@ -73,7 +73,7 @@ export const generateEmailToken = () => {
     throw new Error("JWT_SECRET environment variable is not set.");
   }
   const token = jsonWebToken.sign({ code }, process.env.JWT_SECRET, {
-    expiresIn: 900 // 15 minutes
+    expiresIn: 600 // 10 minutes
   });
 
   return { code, token };

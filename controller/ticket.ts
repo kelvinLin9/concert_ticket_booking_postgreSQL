@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Ticket, Order, TicketType } from '../models';
+import { Ticket, Order, TicketType, Concert, Venue } from '../models';
 
 /**
  * 獲取用戶的所有票券
@@ -176,9 +176,114 @@ export const updateTicket = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
+/**
+ * 獲取指定演唱會的所有票券資訊
+ */
+export const getTicketsByConcert = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { concert: concertId } = req.params;
+    const { status = 'all', sortBy = 'price_asc' } = req.query;
+
+    // 檢查演唱會是否存在
+    const concert = await Concert.findByPk(concertId, {
+      include: [{ model: Venue }]
+    });
+    
+    if (!concert) {
+      return res.status(404).json({
+        status: 'failed',
+        message: '找不到該演唱會',
+        error: {
+          code: 404,
+          details: '請確認演唱會ID是否正確'
+        }
+      });
+    }
+
+    // 建立基本查詢條件
+    const whereClause: any = { concertId };
+    
+    // 根據 status 參數添加篩選條件
+    if (status !== 'all') {
+      whereClause.status = status;
+    }
+
+    // 確定排序方式
+    let order;
+    switch (sortBy) {
+      case 'price_desc':
+        order = [['ticketTypePrice', 'DESC']];
+        break;
+      case 'name_asc':
+        order = [['ticketTypeName', 'ASC']];
+        break;
+      case 'name_desc':
+        order = [['ticketTypeName', 'DESC']];
+        break;
+      case 'price_asc':
+      default:
+        order = [['ticketTypePrice', 'ASC']];
+        break;
+    }
+
+    // 獲取演唱會相關的所有票種
+    const ticketTypes = await TicketType.findAll({
+      where: whereClause,
+      order: order
+    });
+
+    // 只返回實際存在的欄位
+    return res.status(200).json({
+      status: 'success',
+      message: '獲取演唱會票券成功',
+      data: {
+        tickets: ticketTypes.map(ticket => ({
+          ticketTypeId: ticket.ticketTypeId,
+          ticketTypeName: ticket.ticketTypeName,
+          description: ticket.description,
+          entranceType: ticket.entranceType,
+          ticketBenefits: ticket.ticketBenefits,
+          refundPolicy: ticket.refundPolicy,
+          ticketTypePrice: ticket.ticketTypePrice,
+          totalQuantity: ticket.totalQuantity,
+          remainingQuantity: ticket.remainingQuantity,
+          status: ticket.remainingQuantity <= 0 ? 'sold-out' : 'available',
+          sellBeginDate: ticket.sellBeginDate,
+          sellEndDate: ticket.sellEndDate
+        })),
+        concert: {
+          id: concert.id,
+          title: concert.title,
+          description: concert.description,
+          concertType: concert.concertType,
+          image: concert.image,
+          startDate: concert.startDate,
+          endDate: concert.endDate,
+          status: concert.status,
+          organizationId: concert.organizationId,
+          venueId: concert.venueId,
+          totalTickets: concert.totalTickets,
+          soldTickets: concert.soldTickets,
+          region: concert.region,
+          featured: concert.featured,
+          venue: concert.venue ? {
+            id: concert.venue.id,
+            name: concert.venue.name,
+            address: concert.venue.address,
+            region: concert.venue.region
+          } : null
+        }
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   getUserTickets,
   getTicketById,
   verifyTicket,
-  updateTicket
+  updateTicket,
+  getTicketsByConcert
 }; 

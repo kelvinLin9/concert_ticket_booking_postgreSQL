@@ -62,7 +62,7 @@ app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/organizations', organizationRouter);
 app.use('/api/v1/orders', orderRouter);
 app.use('/api/v1/payments', paymentRouter);
-app.use('/api/v1/tickets', ticketRouter);
+app.use('/api/v1/ticket', ticketRouter);
 app.use('/api/v1/ticket-types', ticketTypeRouter);
 
 // 註冊錯誤處理中間件 - 暫時使用簡化版本避免類型問題

@@ -37,9 +37,9 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       return res.status(400).json({ message: '已結束銷售' });
     }
 
-    // 設定鎖票過期時間（15分鐘）
+    // 設定鎖票過期時間（10分鐘）
     const lockExpireTime = new Date();
-    lockExpireTime.setMinutes(lockExpireTime.getMinutes() + 15);
+    lockExpireTime.setMinutes(lockExpireTime.getMinutes() + 10);
 
     // 創建訂單
     const order = await Order.create({

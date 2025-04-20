@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Organization } from '../models/organization';
 import { v4 as uuidv4 } from 'uuid';
+import { CustomRequest } from '../middlewares';
 
 // 擴展Express的Request介面，添加用戶屬性
 declare module 'express' {
@@ -92,9 +93,9 @@ export const getOrganizationById = async (req: Request, res: Response): Promise<
 /**
  * 創建新組織
  */
-export const createOrganization = async (req: Request, res: Response): Promise<void> => {
+export const createOrganization = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       throw new ValidationError('用戶未認證');
     }
@@ -143,10 +144,10 @@ export const createOrganization = async (req: Request, res: Response): Promise<v
 /**
  * 更新組織資訊
  */
-export const updateOrganization = async (req: Request, res: Response): Promise<void> => {
+export const updateOrganization = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
 
     if (!userId) {
       throw new ValidationError('用戶未認證');
@@ -215,10 +216,10 @@ export const updateOrganization = async (req: Request, res: Response): Promise<v
 /**
  * 刪除組織
  */
-export const deleteOrganization = async (req: Request, res: Response): Promise<void> => {
+export const deleteOrganization = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
 
     if (!userId) {
       throw new ValidationError('用戶未認證');
@@ -255,9 +256,9 @@ export const deleteOrganization = async (req: Request, res: Response): Promise<v
 /**
  * 獲取用戶所屬的所有組織
  */
-export const getMyOrganizations = async (req: Request, res: Response): Promise<void> => {
+export const getMyOrganizations = async (req: CustomRequest, res: Response): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
 
     if (!userId) {
       throw new ValidationError('用戶未認證');

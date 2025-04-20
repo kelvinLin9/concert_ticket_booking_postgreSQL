@@ -2,130 +2,159 @@ import {
   Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany
 } from 'sequelize-typescript';
 import { User } from './user';
-import { Concert } from './concert';
-
-interface ITicket {
-  ticketId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  seatInfo?: any;
-}
-
-interface IContactInfo {
-  name: string;
-  email: string;
-  phone: string;
-  address?: string;
-}
-
-interface IPaymentInfo {
-  method: string;
-  transactionId?: string;
-  amount: number;
-  status: string;
-  paidAt?: Date;
-}
+import { TicketType } from './ticketType';
+import { Ticket } from './ticket';
+import { Payment } from './payment';
 
 @Table({
   tableName: 'orders',
   timestamps: true,
-  paranoid: true
+  paranoid: false,
+  underscored: true
 })
 export class Order extends Model {
   @Column({
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
-    primaryKey: true
+    primaryKey: true,
+    field: 'order_id'
   })
-  id!: string;
+  orderId!: string;
+
+  @ForeignKey(() => TicketType)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+    field: 'ticket_type_id'
+  })
+  ticketTypeId!: string;
+
+  @BelongsTo(() => TicketType)
+  ticketType!: TicketType;
 
   @ForeignKey(() => User)
   @Column({
     type: DataType.UUID,
-    allowNull: false
+    allowNull: true,
+    field: 'user_id'
   })
   userId!: string;
 
   @BelongsTo(() => User)
   user!: User;
 
-  @ForeignKey(() => Concert)
   @Column({
-    type: DataType.UUID,
-    allowNull: false
-  })
-  concertId!: string;
-
-  @BelongsTo(() => Concert)
-  concert!: Concert;
-
-  @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(20),
     allowNull: false,
-    unique: true
+    field: 'order_status'
   })
-  orderNumber!: string;
+  orderStatus!: 'held' | 'expired' | 'paid' | 'cancelled' | 'refunded';
 
   @Column({
-    type: DataType.ENUM('pending', 'paid', 'canceled', 'refunded'),
+    type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 'pending'
+    defaultValue: true,
+    field: 'is_locked'
   })
-  status!: string;
+  isLocked!: boolean;
 
   @Column({
-    type: DataType.DECIMAL(10, 2),
+    type: DataType.STRING(100),
     allowNull: false,
-    validate: {
-      min: {
-        args: [0],
-        msg: '訂單總金額不能小於0'
-      }
-    }
+    field: 'lock_token'
   })
-  totalAmount!: number;
-
-  @Column({
-    type: DataType.JSONB,
-    allowNull: true
-  })
-  paymentInfo?: IPaymentInfo;
-
-  @Column({
-    type: DataType.JSONB,
-    allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: '票券資訊為必填欄位'
-      }
-    }
-  })
-  tickets!: ITicket[];
+  lockToken!: string;
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
-    defaultValue: DataType.NOW
+    field: 'lock_expire_time'
   })
-  purchaseDate!: Date;
+  lockExpireTime!: Date;
 
   @Column({
-    type: DataType.JSONB,
+    type: DataType.STRING(50),
+    allowNull: true,
+    field: 'purchaser_name'
+  })
+  purchaserName!: string;
+
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: true,
+    field: 'purchaser_email'
+  })
+  purchaserEmail!: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
+    field: 'purchaser_phone'
+  })
+  purchaserPhone!: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: true,
+    field: 'invoice_platform'
+  })
+  invoicePlatform!: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: true,
+    field: 'invoice_type'
+  })
+  invoiceType!: 'donation' | 'mobile' | 'natural' | 'company';
+
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: true,
+    field: 'invoice_carrier'
+  })
+  invoiceCarrier!: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: true,
+    field: 'invoice_status'
+  })
+  invoiceStatus!: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: true,
+    field: 'invoice_number'
+  })
+  invoiceNumber!: string;
+
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+    field: 'invoice_url'
+  })
+  invoiceUrl!: string;
+
+  @Column({
+    type: DataType.DATE,
     allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: '聯絡資訊為必填欄位'
-      }
-    }
+    defaultValue: DataType.NOW,
+    field: 'created_at'
   })
-  contactInfo!: IContactInfo;
+  createdAt!: Date;
 
   @Column({
-    type: DataType.TEXT,
-    allowNull: true
+    type: DataType.DATE,
+    allowNull: true,
+    field: 'updated_at'
   })
-  notes?: string;
+  updatedAt!: Date;
+
+  @HasMany(() => Ticket)
+  tickets!: Ticket[];
+
+  @HasMany(() => Payment)
+  payments!: Payment[];
 }
 
 export default Order; 

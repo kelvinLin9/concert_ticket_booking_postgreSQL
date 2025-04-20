@@ -1,119 +1,99 @@
 import {
   Table, Column, Model, DataType, ForeignKey, BelongsTo
 } from 'sequelize-typescript';
-import { Concert } from './concert';
-
-interface ISeatInfo {
-  section?: string;
-  row?: string;
-  seatNumber?: string;
-  floor?: string;
-  area?: string;
-}
+import { User } from './user';
+import { Order } from './order';
+import { TicketType } from './ticketType';
 
 @Table({
   tableName: 'tickets',
   timestamps: true,
-  paranoid: true
+  paranoid: false,
+  underscored: true
 })
 export class Ticket extends Model {
   @Column({
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
-    primaryKey: true
+    primaryKey: true,
+    field: 'ticket_id'
   })
-  id!: string;
+  ticketId!: string;
 
-  @ForeignKey(() => Concert)
+  @ForeignKey(() => Order)
   @Column({
     type: DataType.UUID,
-    allowNull: false
-  })
-  concertId!: string;
-
-  @BelongsTo(() => Concert)
-  concert!: Concert;
-
-  @Column({
-    type: DataType.STRING,
     allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: '票種名稱為必填欄位'
-      }
-    }
+    field: 'order_id'
   })
-  name!: string;
+  orderId!: string;
 
+  @BelongsTo(() => Order)
+  order!: Order;
+
+  @ForeignKey(() => TicketType)
   @Column({
-    type: DataType.DECIMAL(10, 2),
+    type: DataType.UUID,
     allowNull: false,
-    validate: {
-      min: {
-        args: [0],
-        msg: '票價不能小於0'
-      }
-    }
+    field: 'ticket_type_id'
   })
-  price!: number;
+  ticketTypeId!: string;
 
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    validate: {
-      min: {
-        args: [0],
-        msg: '票種數量不能小於0'
-      }
-    }
-  })
-  quantity!: number;
+  @BelongsTo(() => TicketType)
+  ticketType!: TicketType;
 
+  @ForeignKey(() => User)
   @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: {
-        args: [0],
-        msg: '已售數量不能小於0'
-      }
-    }
-  })
-  sold!: number;
-
-  @Column({
-    type: DataType.JSONB,
+    type: DataType.UUID,
     allowNull: true,
-    defaultValue: {}
+    field: 'user_id'
   })
-  seatInfo?: ISeatInfo;
+  userId!: string;
+
+  @BelongsTo(() => User)
+  user!: User;
+
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: true,
+    field: 'purchaser_name'
+  })
+  purchaserName!: string;
+
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: true,
+    field: 'purchaser_email'
+  })
+  purchaserEmail!: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: true,
+    field: 'seat_number'
+  })
+  seatNumber!: string;
+
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+    field: 'qr_code'
+  })
+  qrCode!: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: false,
+    field: 'status'
+  })
+  status!: 'purchased' | 'refunded' | 'used';
 
   @Column({
     type: DataType.DATE,
-    allowNull: false
-  })
-  saleStartDate!: Date;
-
-  @Column({
-    type: DataType.DATE,
-    allowNull: false
-  })
-  saleEndDate!: Date;
-
-  @Column({
-    type: DataType.ENUM('available', 'sold-out', 'off-sale'),
     allowNull: false,
-    defaultValue: 'available'
+    field: 'purchase_time'
   })
-  status!: string;
-
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  })
-  isReserved!: boolean;
+  purchaseTime!: Date;
 }
 
 export default Ticket; 

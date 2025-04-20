@@ -6,20 +6,23 @@ import { Order } from './order';
 @Table({
   tableName: 'payments',
   timestamps: true,
-  paranoid: true
+  paranoid: false,
+  underscored: true
 })
 export class Payment extends Model {
   @Column({
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
-    primaryKey: true
+    primaryKey: true,
+    field: 'payment_id'
   })
-  id!: string;
+  paymentId!: string;
 
   @ForeignKey(() => Order)
   @Column({
     type: DataType.UUID,
-    allowNull: false
+    allowNull: false,
+    field: 'order_id'
   })
   orderId!: string;
 
@@ -27,71 +30,76 @@ export class Payment extends Model {
   order!: Order;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(50),
     allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: '支付方式為必填欄位'
-      }
-    }
+    field: 'method'
   })
-  paymentMethod!: string;
+  method!: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
+    field: 'provider'
+  })
+  provider!: string;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: false,
+    field: 'status'
+  })
+  status!: 'pending' | 'completed' | 'failed' | 'refunded';
 
   @Column({
     type: DataType.DECIMAL(10, 2),
     allowNull: false,
-    validate: {
-      min: {
-        args: [0],
-        msg: '支付金額不能小於0'
-      }
-    }
+    field: 'amount'
   })
   amount!: number;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: false,
-    defaultValue: 'TWD'
+    type: DataType.STRING(10),
+    allowNull: true,
+    defaultValue: 'TWD',
+    field: 'currency'
   })
   currency!: string;
 
   @Column({
-    type: DataType.ENUM('pending', 'success', 'failed', 'refunded'),
-    allowNull: false,
-    defaultValue: 'pending'
+    type: DataType.DATE,
+    allowNull: true,
+    field: 'paid_at'
   })
-  status!: string;
+  paidAt?: Date;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true
+    type: DataType.STRING(100),
+    allowNull: true,
+    field: 'transaction_id'
   })
   transactionId?: string;
 
   @Column({
-    type: DataType.DATE,
-    allowNull: true
+    type: DataType.JSON,
+    allowNull: true,
+    field: 'raw_payload'
   })
-  paymentDate?: Date;
+  rawPayload?: any;
 
   @Column({
     type: DataType.DATE,
-    allowNull: true
+    allowNull: false,
+    defaultValue: DataType.NOW,
+    field: 'created_at'
   })
-  refundDate?: Date;
+  createdAt!: Date;
 
   @Column({
-    type: DataType.DECIMAL(10, 2),
-    allowNull: true
+    type: DataType.DATE,
+    allowNull: true,
+    field: 'updated_at'
   })
-  refundAmount?: number;
-
-  @Column({
-    type: DataType.JSONB,
-    allowNull: true
-  })
-  gatewayResponse?: any;
+  updatedAt!: Date;
 }
 
 export default Payment; 

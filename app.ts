@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 
@@ -20,6 +20,10 @@ import userRouter from './routes/users';
 import verifyRouter from './routes/verify';
 import adminRouter from './routes/admin';
 import organizationRouter from './routes/organization';
+import orderRouter from './routes/order';
+import paymentRouter from './routes/payment';
+import ticketRouter from './routes/ticket';
+import ticketTypeRouter from './routes/ticketType';
 
 const app = express();
 
@@ -56,41 +60,22 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/verify', verifyRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/organizations', organizationRouter);
+app.use('/api/v1/orders', orderRouter);
+app.use('/api/v1/payments', paymentRouter);
+app.use('/api/v1/tickets', ticketRouter);
+app.use('/api/v1/ticket-types', ticketTypeRouter);
 
-// 錯誤處理中間件
-app.use((err: Error & { 
-  status?: number, 
-  code?: string, 
-  isOperational?: boolean,
-  name?: string,
-  remainingSeconds?: number,
-  // 添加任何其他可能的自定義屬性
-  [key: string]: any
-}, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  // console.error('應用錯誤:', err);
-  // console.error('錯誤類型:', err.constructor.name);
-  // console.error('錯誤名稱:', err.name);
-  // console.error('錯誤堆棧:', err.stack);
-  // console.error('isOperational:', err.isOperational);
-  // console.error('錯誤屬性:', Object.keys(err));
-  
+// 註冊錯誤處理中間件 - 暫時使用簡化版本避免類型問題
+app.use((err: any, req: any, res: any, next: any) => {
   const statusCode = err.status || 500;
-  
-  // 使用 isOperational 標記 或 檢查錯誤名稱是否為 AppError
-  const isAppError = err.isOperational === true || err.name === 'AppError';
-  
-  // 測試環境中返回完整錯誤信息
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  
-  // 先一律這樣返回
   res.status(statusCode).json({
     status: 'failed',
     message: err.message || '系統發生錯誤',
   });
 });
 
-// 404 處理中間件
-app.use((req, res) => {
+// 註冊 404 處理中間件 - 暫時使用簡化版本避免類型問題
+app.use((req: any, res: any) => {
   res.status(404).json({
     status: 'failed',
     message: '找不到該資源',

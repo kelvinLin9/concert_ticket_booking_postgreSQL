@@ -6,6 +6,7 @@ import { Concert } from './concert';
 import { Ticket } from './ticket';
 import { Order } from './order';
 import { Payment } from './payment';
+import { TicketType } from './ticketType';
 
 // 註冊所有模型
 const models = [
@@ -13,6 +14,7 @@ const models = [
   Organization,
   Venue,
   Concert,
+  TicketType,
   Ticket,
   Order,
   Payment
@@ -25,6 +27,7 @@ export {
   Organization,
   Venue,
   Concert,
+  TicketType,
   Ticket,
   Order,
   Payment
@@ -36,6 +39,7 @@ export default {
   Organization,
   Venue,
   Concert,
+  TicketType,
   Ticket,
   Order,
   Payment

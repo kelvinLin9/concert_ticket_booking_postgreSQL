@@ -59,15 +59,27 @@ export class User extends Model {
 
   @Column({
     type: DataType.STRING,
-    allowNull: true,
+    allowNull: false,
     validate: {
       len: {
-        args: [6, 100],
-        msg: '密碼至少需要 6 個字元以上'
+        args: [8, 100],
+        msg: '密碼至少需要 8 個字元以上'
       }
     }
   })
-  password?: string; // TypeORM: @Column({ select: false }) 可隱藏敏感欄位
+  password!: string; // TypeORM: @Column({ select: false }) 可隱藏敏感欄位
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    validate: {
+      len: {
+        args: [20, 50],
+        msg: '姓名必須介於20到50個字符之間'
+      }
+    }
+  })
+  name!: string; // TypeORM: @Column()
 
   @Column({
     type: DataType.STRING,
@@ -75,19 +87,7 @@ export class User extends Model {
     validate: {
       len: {
         args: [1, 40],
-        msg: '姓名不能超過40個字符'
-      }
-    }
-  })
-  name?: string; // TypeORM: @Column()
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-    validate: {
-      len: {
-        args: [1, 20],
-        msg: '暱稱不能超過20個字符'
+        msg: '暱稱不能超過40個字符'
       }
     }
   })

@@ -48,6 +48,17 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       throw createHttpError(400, '姓名為必填欄位');
     }
     
+    // 驗證密碼格式：至少8碼，英文+數字混合
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      throw createHttpError(400, '密碼格式不正確，需至少8碼且包含英文和數字');
+    }
+    
+    // 驗證姓名長度
+    if (name.length < 20 || name.length > 50) {
+      throw createHttpError(400, '姓名必須介於20到50個字符之間');
+    }
+    
     // 檢查 email 是否已經被註冊
     const existingUser = await User.findOne({
       where: { email }

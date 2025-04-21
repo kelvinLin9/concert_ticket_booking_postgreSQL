@@ -21,7 +21,7 @@ interface AuthTokenPayload {
   exp: number;
 }
 
-export const generateToken = (user: User) => {
+export const generateToken = (user: any) => {
   if (!process.env.JWT_SECRET || !process.env.JWT_EXPIRES_DAY) {
     throw new Error("Required JWT environment variables are not set.");
   }

@@ -5,7 +5,7 @@ declare global {
     interface User {
       id: string;
       userId: string;
-      role: string | 'user' | 'admin' | 'superuser' | 'organizer';
+      role: string;
       email?: string;
       [key: string]: any;
     }

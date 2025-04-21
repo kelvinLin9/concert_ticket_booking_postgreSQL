@@ -28,8 +28,7 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
     // 設置 user 屬性，確保與 Express.User 接口兼容
     req.user = {
       id: decoded.userId,
-      userId: decoded.userId,
-      role: decoded.role
+      role: decoded.role as "user" | "admin" | "superuser"
     };
     
     console.log('req.user:', decoded);

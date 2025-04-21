@@ -10,8 +10,9 @@ import { AppError } from '../statusHandle/AppError';
 import { Op } from 'sequelize';
 
 // Google 登入相關介面
-interface GoogleRequest extends Request {
+interface GoogleRequest extends Omit<Request, 'user'> {
   user?: {
+    id: string; // 添加 id 屬性以與 Express.User 兼容
     user: {
       id: string;
       name: string;

@@ -3,6 +3,7 @@ import jsonWebToken from 'jsonwebtoken';
 import { SignOptions } from 'jsonwebtoken';
 
 interface User {
+  id: string;
   userId: string;
   role: string;
 }
@@ -27,7 +28,7 @@ export const generateToken = (user: User) => {
   
   // 生成 payload，包括用戶 ID 和角色
   const payload = {
-    userId: user.userId,
+    userId: user.userId || user.id, // 支持兩種屬性名稱
     role: user.role,
   };
   

@@ -5,7 +5,11 @@ import { Request, Response, NextFunction } from 'express';
 
 // 擴展 Request 類型，使用 any 類型避免類型檢查錯誤
 export interface CustomRequest extends Omit<Request, 'user'> {
-  user?: any;
+  user?: {
+    userId: string;
+    id: string; // 添加 id 屬性與 userId 保持一致
+    role: string;
+  };
   token?: string;
 }
 
@@ -21,10 +25,10 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
       throw createHttpError(401, '無效的 Token 格式');
     }
     
-    // 使用類型斷言處理類型不兼容問題
-    (req as any).user = {
+    // 設置 user 屬性，確保與 Express.User 接口兼容
+    req.user = {
+      id: decoded.userId,
       userId: decoded.userId,
-      id: decoded.userId, // 添加 id 屬性與 userId 保持一致
       role: decoded.role
     };
     

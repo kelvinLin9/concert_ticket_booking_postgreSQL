@@ -7,8 +7,9 @@ import { handleErrorAsync } from '../statusHandle/handleErrorAsync';
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 
-interface CustomRequest extends Request {
+interface CustomRequest extends Omit<Request, 'user'> {
   user?: {
+    id: string;
     userId: string;
     role: string;
   };

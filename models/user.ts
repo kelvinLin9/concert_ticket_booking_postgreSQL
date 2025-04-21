@@ -46,12 +46,16 @@ export class User extends Model {
   id!: string; // TypeORM: @PrimaryGeneratedColumn("uuid")
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(100),
     allowNull: false,
     unique: true,
     validate: {
       isEmail: {
         msg: 'Email 格式不正確'
+      },
+      len: {
+        args: [5, 100],
+        msg: 'Email 長度必須在5到100個字元之間'
       }
     }
   })
@@ -74,20 +78,20 @@ export class User extends Model {
     allowNull: false,
     validate: {
       len: {
-        args: [20, 50],
-        msg: '姓名必須介於20到50個字符之間'
+        args: [2, 50],
+        msg: '姓名必須介於2到50個字符之間'
       }
     }
   })
   name!: string; // TypeORM: @Column()
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(20),
     allowNull: true,
     validate: {
       len: {
-        args: [1, 40],
-        msg: '暱稱不能超過40個字符'
+        args: [1, 20],
+        msg: '暱稱長度必須在1到20個字元之間'
       }
     }
   })

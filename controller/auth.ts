@@ -48,6 +48,11 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       throw createHttpError(400, '姓名為必填欄位');
     }
     
+    // 驗證電子郵件長度
+    if (email.length < 5 || email.length > 100) {
+      throw createHttpError(400, 'Email 長度必須在5到100個字元之間');
+    }
+    
     // 驗證密碼格式：至少8碼，英文+數字混合
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     if (!passwordRegex.test(password)) {
@@ -55,8 +60,13 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
     
     // 驗證姓名長度
-    if (name.length < 20 || name.length > 50) {
-      throw createHttpError(400, '姓名必須介於20到50個字符之間');
+    if (name.length < 2 || name.length > 50) {
+      throw createHttpError(400, '姓名必須介於2到50個字符之間');
+    }
+    
+    // 驗證暱稱長度（如果提供了暱稱）
+    if (nickname && (nickname.length < 1 || nickname.length > 20)) {
+      throw createHttpError(400, '暱稱長度必須在1到20個字元之間');
     }
     
     // 檢查 email 是否已經被註冊
